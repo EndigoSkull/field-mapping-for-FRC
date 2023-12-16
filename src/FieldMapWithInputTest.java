@@ -3,8 +3,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class FieldMapWithInputTest extends FieldMapTest{
-    private final ArrayList<Integer> inputLineX = new ArrayList<>();
-    private final ArrayList<Integer> inputLineY = new ArrayList<>();
+    private final ArrayList<int[]> inputLineX = new ArrayList<>();
+    private final ArrayList<int[]> inputLineY = new ArrayList<>();
     private final ArrayList<Integer> inputLineCount = new ArrayList<>();
 
     private final ArrayList<Integer> inputCircleX = new ArrayList<>();
@@ -22,14 +22,14 @@ public class FieldMapWithInputTest extends FieldMapTest{
         super(mapLengthX, mapWidthY);
     }
 
-    public boolean addLineInput(int x, int y){
+    public boolean addLineInput(int x1, int y1, int x2, int y2){
         for(int i = 0; i < inputLineX.size(); i++)
-            if(inputLineX.get(i) == x && inputLineY.get(i) == y) {
+            if(inputLineX.get(i)[0] == x1 && inputLineX.get(i)[1] == x2 && inputLineY.get(i)[0] == y1 && inputLineY.get(i)[1] == y2) {
                 inputLineCount.set(i, inputLineCount.get(i) + 1);
                 return false;
             }
-        inputLineX.add(x);
-        inputLineY.add(y);
+        inputLineX.add(new int[]{x1, x2});
+        inputLineY.add(new int[]{y1, y2});
         inputLineCount.add(1);
         return true;
     }
@@ -72,8 +72,7 @@ public class FieldMapWithInputTest extends FieldMapTest{
     }
     @Override
     public boolean drawLine(int x1, int y1, int x2, int y2){
-        this.addLineInput(x1, y1);
-        this.addLineInput(x2, y2);
+        this.addLineInput(x1, y1, x2, y2);
 
         return super.drawLine(x1, y1, x2, y2);
     }
@@ -133,8 +132,10 @@ public class FieldMapWithInputTest extends FieldMapTest{
     public int[][] getCombinedMap(){
         int[][] intMap = super.getBaseIntMap();
 
-        for(int i = 0; i < inputLineX.size(); i++)
-            intMap[inputLineY.get(i)][inputLineX.get(i)] += inputLineCount.get(i)*2;
+        for(int i = 0; i < inputLineX.size(); i++) {
+            intMap[inputLineY.get(i)[0]][inputLineX.get(i)[0]] += inputLineCount.get(i) * 2;
+            intMap[inputLineY.get(i)[1]][inputLineX.get(i)[1]] += inputLineCount.get(i) * 2;
+        }
 
         for(int i = 0; i < inputCircleX.size(); i++)
             intMap[inputCircleY.get(i)][inputCircleX.get(i)] += inputCircleCount.get(i)*20;
@@ -148,7 +149,8 @@ public class FieldMapWithInputTest extends FieldMapTest{
         FieldMapTest lineInputMap = new FieldMapTest(this.getMapX(), this.getMapY());
 
         for(int i = 0; i < inputLineX.size(); i++){
-            lineInputMap.drawPixel(inputLineX.get(i), inputLineY.get(i));
+            lineInputMap.drawPixel(inputLineX.get(i)[0], inputLineY.get(i)[0]);
+            lineInputMap.drawPixel(inputLineX.get(i)[1], inputLineY.get(i)[1]);
         }
 
         return lineInputMap;
@@ -156,10 +158,9 @@ public class FieldMapWithInputTest extends FieldMapTest{
     public FieldMapTest getLineMap(){
         FieldMapTest lineMap = new FieldMapTest(this.getMapX(), this.getMapY());
 
-        for(int i = 0; i < inputLineX.size()-1; i++){
-            lineMap.drawLine(inputLineX.get(i), inputLineY.get(i), inputLineX.get(i+1), inputLineY.get(i+1));
+        for(int i = 0; i < inputLineX.size(); i++){
+            lineMap.drawLine(inputLineX.get(i)[0], inputLineY.get(i)[0], inputLineX.get(i)[1], inputLineY.get(i)[1]);
         }
-        lineMap.drawLine(inputLineX.get(inputLineX.size()-1), inputLineY.get(inputLineX.size()-1), inputLineX.get(0), inputLineY.get(0));
 
         return lineMap;
     }
@@ -186,11 +187,27 @@ public class FieldMapWithInputTest extends FieldMapTest{
 
         return circleMap;
     }
+    public FieldMapTest getPolygonInputMap(){
+        FieldMapTest polygonInputMap = new FieldMapTest(this.getMapX(), this.getMapY());
 
-    public ArrayList<Integer> getInputLineX(){
+        for(int i = 0; i < inputPolygonX.size(); i++)
+            polygonInputMap.drawPolygon(inputPolygonX.get(i), inputPolygonY.get(i), false);
+
+        return polygonInputMap;
+    }
+    public FieldMapTest getPolygonMap(){
+        FieldMapTest polygonMap = new FieldMapTest(this.getMapX(), this.getMapY());
+
+        for(int i = 0; i < inputPolygonX.size(); i++)
+            polygonMap.drawPolygon(inputPolygonX.get(i), inputPolygonY.get(i), inputPolygonFilled.get(i));
+
+        return polygonMap;
+    }
+
+    public ArrayList<int[]> getInputLineX(){
         return (new ArrayList<>(List.copyOf(inputLineX)));
     }
-    public ArrayList<Integer> getInputLineY(){
+    public ArrayList<int[]> getInputLineY(){
         return (new ArrayList<>(List.copyOf(inputLineY)));
     }
     public ArrayList<Integer> getInputLineCount(){
@@ -217,10 +234,10 @@ public class FieldMapWithInputTest extends FieldMapTest{
     public ArrayList<int[]> getInputPolygonY(){
         return (new ArrayList<>(List.copyOf(inputPolygonY)));
     }
-    private ArrayList<Boolean> getInputPolygonFilled(){
+    public ArrayList<Boolean> getInputPolygonFilled(){
         return (new ArrayList<>(List.copyOf(inputPolygonFilled)));
     }
-    private ArrayList<Integer> getInputPolygonCount(){
+    public ArrayList<Integer> getInputPolygonCount(){
         return (new ArrayList<>(List.copyOf(inputPolygonCount)));
     }
 

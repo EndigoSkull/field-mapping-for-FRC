@@ -103,19 +103,24 @@ public class FieldMapTest {
     public void drawPolygon(int[] verticesX, int[] verticesY, boolean fillPolygon){
         assert(verticesX.length == verticesY.length);
 
-        FieldMapTest tempFieldMap = new FieldMapTest(this.getMapX(), this.getMapY());
-
-        for(int i = 0; i < verticesX.length - 1; i++)
-            tempFieldMap.drawLine(verticesX[i], verticesY[i], verticesX[i+1], verticesY[i+1]);
-        tempFieldMap.drawLine(verticesX[verticesX.length-1], verticesY[verticesY.length-1], verticesX[0], verticesY[0]);
-
         if(fillPolygon) {
+            FieldMapTest tempFieldMap = new FieldMapTest(this.getMapX(), this.getMapY());
+
+            for(int i = 0; i < verticesX.length - 1; i++)
+                tempFieldMap.drawLine(verticesX[i], verticesY[i], verticesX[i+1], verticesY[i+1]);
+            tempFieldMap.drawLine(verticesX[verticesX.length-1], verticesY[verticesY.length-1], verticesX[0], verticesY[0]);
+
             tempFieldMap.fillComplexPolygon(verticesX, verticesY);
 
             this.addOtherMap(tempFieldMap);
 
-            System.out.println("Temp Field Map:");
-            System.out.println(tempFieldMap);
+//            System.out.println("Temp Field Map:");
+//            System.out.println(tempFieldMap);
+        }
+        else {
+            for (int i = 0; i < verticesX.length - 1; i++)
+                this.drawLine(verticesX[i], verticesY[i], verticesX[i + 1], verticesY[i + 1]);
+            this.drawLine(verticesX[verticesX.length - 1], verticesY[verticesY.length - 1], verticesX[0], verticesY[0]);
         }
     }
 
@@ -239,8 +244,8 @@ public class FieldMapTest {
         else
             System.out.println("Couldn't find a corner");
 
-        System.out.println("Other Map:");
-        System.out.println(otherMap);
+//        System.out.println("Other Map:");
+//        System.out.println(otherMap);
 
         this.inverseAddOtherMap(otherMap, xMax, xMin, yMax, yMin);
     }
