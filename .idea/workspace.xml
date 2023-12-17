@@ -5,6 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="152bc897-4125-4163-aaa6-2c98d3a6bd4e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/UpdatableAndExpandableFieldMapTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/FieldMapTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FieldMapTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/FieldMapWithInputTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FieldMapWithInputTest.java" afterDir="false" />
@@ -40,6 +42,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "settings.editor.selected.configurable": "editing.templates"
   }

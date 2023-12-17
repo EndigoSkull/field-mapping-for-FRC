@@ -5,9 +5,10 @@ public class Main {
     private static final int randomLineNum = 0;
     private static final int randomCircleNum = 0;
     private static final boolean randomFillCircle = false;
-    private static final boolean fillCircle = true;
+    private static final boolean randomQuadrants = true;
+    private static final boolean fillCircleQuadrants = false;
     private static final int randomPolygonNum = 1;
-    private static final int polygonVertNum = 10;
+    private static final int polygonVertNum = 6;
     private static final boolean fillPolygon = true;
 
     public static void main(String[] args) {
@@ -24,6 +25,26 @@ public class Main {
         double inputBaseScaleMapTime = runTests(inputBaseScaleMap);
         double inputToScaleMapTime = runTests(inputToScaleMap);
 
+//        double centerX = Math.random() * inputToScaleMap.getMapX();
+//        double centerY = Math.random() * inputToScaleMap.getMapY();
+//        double radius = Math.random()*((Math.min(inputToScaleMap.getMapX(), inputToScaleMap.getMapY()))/2.0);
+//
+//        boolean quadrant1 = Math.random() > 0.5;
+//        boolean quadrant2 = Math.random() > 0.5;
+//        boolean quadrant3 = Math.random() > 0.5;
+//        boolean quadrant4 = Math.random() > 0.5;
+//
+//        //inputToScaleMap.drawCircleQuadrant(centerX, centerY, quadrant1, quadrant2, quadrant3, quadrant4, radius, fillCircle);
+//        toScaleMap.drawCircleQuadrant(centerX, centerY, quadrant1, quadrant2, quadrant3, quadrant4, radius, fillCircleQuadrants);
+//
+//        System.out.println(quadrant1);
+//        System.out.println(quadrant2);
+//        System.out.println(quadrant3);
+//        System.out.println(quadrant4);
+//        System.out.println("("+centerX+", "+centerY+")");
+//        System.out.println(radius);
+//
+//        System.out.println(toScaleMap);
         printData(inputToScaleMap, inputToScaleMapTime);
 
         System.out.println("baseScaleMapTime: "+baseScaleMapTime);
@@ -50,10 +71,14 @@ public class Main {
             double centerY = Math.random() * field.getMapY();
             double radius = Math.random()*((Math.min(field.getMapX(), field.getMapY()))/2.0);
 
-            if(randomFillCircle)
+            if(randomFillCircle && randomQuadrants)
+                field.drawCircleQuadrant(centerX, centerY, Math.random() > 0.5, Math.random() > 0.5, Math.random() > 0.5, Math.random() > 0.5, radius, Math.random() > 0.5);
+            else if(randomFillCircle)
                 field.drawCircle(centerX, centerY, radius, Math.random() > 0.5);
+            else if(randomQuadrants)
+                field.drawCircleQuadrant(centerX, centerY, Math.random() > 0.5, Math.random() > 0.5, Math.random() > 0.5, Math.random() > 0.5, radius, fillCircleQuadrants);
             else
-                field.drawCircle(centerX, centerY, radius, fillCircle);
+                field.drawCircle(centerX, centerY, radius, fillCircleQuadrants);
         }
 
         for(int i = 0; i < randomPolygonNum; i++) {
@@ -85,7 +110,7 @@ public class Main {
         System.out.println("Circle Input Map:");
         System.out.println(field.getCircleInputMap());
         System.out.println("Circle Map");
-        System.out.println(field.getCircleMap(true, true));
+        System.out.println(field.getCircleMap(false, true));
         System.out.println("Polygon Input Map:");
         System.out.println(field.getPolygonInputMap());
         System.out.println("Polygon Map:");
@@ -102,6 +127,7 @@ public class Main {
 
         System.out.println("Circle X inputs: "+field.getInputCircleX());
         System.out.println("Circle Y inputs: "+field.getInputCircleY());
+        System.out.println("Circle quadrant inputs: "+field.getInputCircleQuadrants());
         System.out.println("Circle radius inputs: "+field.getInputCircleRadius());
         System.out.println("Circle fill inputs: "+field.getInputCircleFilled());
         System.out.println("Circle counts: "+field.getInputCircleCount());

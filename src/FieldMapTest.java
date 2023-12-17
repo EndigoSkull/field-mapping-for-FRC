@@ -1,4 +1,7 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 public class FieldMapTest {
     private boolean[][] fieldPixelMap;
@@ -21,6 +24,12 @@ public class FieldMapTest {
     }
     public boolean checkPixelOnMap(int x, int y){
         return x >= 0 && x < this.getMapX() && y>= 0 && y < this.getMapY();
+    }
+
+    public boolean checkPixelHasObjectOrOffMap(int x, int y){
+        if(x >= 0 && x < this.getMapX() && y>= 0 && y < this.getMapY())
+            return fieldPixelMap[y][x];
+        return true;
     }
 
     public boolean drawPixel(double x, double y){
@@ -60,13 +69,66 @@ public class FieldMapTest {
         this.drawCircle((int)centerX, (int)centerY, radius, fillCircle);
     }
     public void drawCircle(int centerX, int centerY, double radius, boolean fillCircle){
+        this.drawCircleQuadrant(centerX, centerY, true, true, true, true, radius, fillCircle);
+    }
+    public void drawCircleQuadrant(double centerX, double centerY, boolean quadrant1, boolean quadrant2, boolean quadrant3, boolean quadrant4, double radius, boolean fillQuadrant){
+        this.drawCircleQuadrant((int)centerX, (int)centerY, quadrant1, quadrant2, quadrant3, quadrant4, radius, fillQuadrant);
+    }
+    public void drawCircleQuadrant(int centerX, int centerY, boolean quadrant1, boolean quadrant2, boolean quadrant3, boolean quadrant4, double radius, boolean fillQuadrant){
+        //TODO from here
+        radius++;
+
         FieldMapTest tempFieldMap = new FieldMapTest(this.getMapX(), this.getMapY());
 
-        Bresenham.drawCircle(tempFieldMap, centerX, centerY, radius);
-        if(fillCircle)
-            tempFieldMap.fillSimplePolygon(centerX, centerY);
+        Bresenham.drawQuadrant(tempFieldMap, centerX, centerY, radius,  quadrant1, quadrant2, quadrant3, quadrant4);
 
-        this.addOtherMap(tempFieldMap);
+        if(!(quadrant1 && quadrant2 && quadrant3 && quadrant4) && (quadrant1 || quadrant2 || quadrant3 || quadrant4))
+            tempFieldMap.drawPixel(centerX, centerY);
+
+        if(quadrant1 ^ quadrant2)
+            for(int stepCoefficient = 1; stepCoefficient < radius; stepCoefficient++)
+                tempFieldMap.drawPixel(centerX, centerY + stepCoefficient);
+        if(quadrant2 ^ quadrant3)
+            for(int stepCoefficient = 1; stepCoefficient < radius; stepCoefficient++)
+                tempFieldMap.drawPixel(centerX - stepCoefficient, centerY);
+        if(quadrant3 ^ quadrant4)
+            for(int stepCoefficient = 1; stepCoefficient < radius; stepCoefficient++)
+                tempFieldMap.drawPixel(centerX, centerY - stepCoefficient);
+        if(quadrant4 ^ quadrant1)
+            for(int stepCoefficient = 1; stepCoefficient < radius; stepCoefficient++)
+                tempFieldMap.drawPixel(centerX + stepCoefficient, centerY);
+
+        if((int)radius >=2)
+            if (fillQuadrant) {
+                if (quadrant1)
+                    tempFieldMap.fillSimplePolygon(centerX + 1, centerY + 1);
+                if (quadrant2)
+                    tempFieldMap.fillSimplePolygon(centerX - 1, centerY + 1);
+                if (quadrant3)
+                    tempFieldMap.fillSimplePolygon(centerX - 1, centerY - 1);
+                if (quadrant4)
+                    tempFieldMap.fillSimplePolygon(centerX + 1, centerY - 1);
+            }
+
+//        System.out.println("Temp Map: ");
+//        System.out.println(tempFieldMap);
+
+        if((quadrant1 ^ quadrant2 ^ quadrant3 ^ quadrant4) && (quadrant1 && quadrant2) == (quadrant3 && quadrant4))
+            this.addOtherMap(
+                    tempFieldMap,
+                    (int)(quadrant4 || quadrant1 ? centerX+(radius+1) : centerX+1),
+                    (int)(quadrant2 || quadrant3 ? centerX-(radius+1) : centerX-1),
+                    (int)(quadrant1 || quadrant2 ? centerY+(radius+1) : centerY+1),
+                    (int)(quadrant3 || quadrant4 ? centerY-(radius+1) : centerY-1)
+            );
+        else
+            this.addOtherMap(
+                    tempFieldMap,
+                    (int)(centerX+(radius+1)),
+                    (int)(centerX-(radius+1)),
+                    (int)(centerY+(radius+1)),
+                    (int)(centerY-(radius+1))
+            );
     }
 
     public void drawPolygonDouble(List<Double> verticesX, List<Double> verticesY, boolean fillPolygon){
@@ -110,9 +172,25 @@ public class FieldMapTest {
                 tempFieldMap.drawLine(verticesX[i], verticesY[i], verticesX[i+1], verticesY[i+1]);
             tempFieldMap.drawLine(verticesX[verticesX.length-1], verticesY[verticesY.length-1], verticesX[0], verticesY[0]);
 
-            tempFieldMap.fillComplexPolygon(verticesX, verticesY);
+            int xMax = 0;
+            int xMin = this.getMapX()-1;
+            int yMax = 0;
+            int yMin = this.getMapY()-1;
 
-            this.addOtherMap(tempFieldMap);
+            for (int a : verticesX) {
+                xMax = Math.max(a, xMax);
+                xMin = Math.min(a, xMin);
+            }
+            for (int a : verticesY) {
+                yMax = Math.max(a, yMax);
+                yMin = Math.min(a, yMin);
+            }
+
+
+
+            tempFieldMap.fillComplexPolygon(xMax, xMin, yMax, yMin);
+
+            this.addOtherMap(tempFieldMap, xMax, xMin, yMax, yMin);
 
 //            System.out.println("Temp Field Map:");
 //            System.out.println(tempFieldMap);
@@ -155,13 +233,13 @@ public class FieldMapTest {
     }
 
     public void fillSimplePolygon(double fillX, double fillY){
-        fillSimplePolygon((int)fillX, (int)fillY);
+        this.fillSimplePolygon((int)fillX, (int)fillY);
     }
     public void fillSimplePolygon(int fillX, int fillY){
-        fillSimplePolygon(fillX, fillY, this.getMapX()-1, 0, this.getMapY()-1, 0);
+        this.fillSimplePolygon(fillX, fillY, this.getMapX()-1, 0, this.getMapY()-1, 0);
     }
     public void fillSimplePolygon(int fillX, int fillY, int xMax, int xMin, int yMax, int yMin){
-        assert(fillX<xMax && fillX>xMin && fillY<yMax && fillY>yMin);
+        assert(fillX<=xMax && fillX>=xMin && fillY<=yMax && fillY>=yMin);
 
         ArrayList<Integer> toBeFilledX = new ArrayList<>(List.of(fillX));
         ArrayList<Integer> toBeFilledY = new ArrayList<>(List.of(fillY));
@@ -175,7 +253,7 @@ public class FieldMapTest {
 
             this.drawPixel(currentX, currentY);
 
-            if(currentX < xMax && this.checkPixelOnMap(currentX + 1, currentY) && !this.checkPixelHasObject(currentX + 1, currentY)){
+            if(currentX <= xMax && !this.checkPixelHasObjectOrOffMap(currentX + 1, currentY)){
                 int coordHashLength = coordHash.size();
                 coordHash.add(Objects.hash(currentX + 1, currentY));
                 if(coordHash.size()>coordHashLength) {
@@ -183,7 +261,7 @@ public class FieldMapTest {
                     toBeFilledY.add(currentY);
                 }
             }
-            if(currentX > xMin && this.checkPixelOnMap(currentX - 1, currentY) && !this.checkPixelHasObject(currentX - 1, currentY)){
+            if(currentX >= xMin && !this.checkPixelHasObjectOrOffMap(currentX - 1, currentY)){
                 int coordHashLength = coordHash.size();
                 coordHash.add(Objects.hash(currentX - 1, currentY));
                 if(coordHash.size()>coordHashLength) {
@@ -191,7 +269,7 @@ public class FieldMapTest {
                     toBeFilledY.add(currentY);
                 }
             }
-            if(currentY < yMax && this.checkPixelOnMap(currentX, currentY + 1) && !this.checkPixelHasObject(currentX, currentY + 1)){
+            if(currentY <= yMax && !this.checkPixelHasObjectOrOffMap(currentX, currentY + 1)){
                 int coordHashLength = coordHash.size();
                 coordHash.add(Objects.hash(currentX, currentY + 1));
                 if(coordHash.size()>coordHashLength) {
@@ -199,7 +277,7 @@ public class FieldMapTest {
                     toBeFilledY.add(currentY + 1);
                 }
             }
-            if(currentY > yMin && this.checkPixelOnMap(currentX, currentY - 1) && !this.checkPixelHasObject(currentX, currentY - 1)){
+            if(currentY >= yMin && !this.checkPixelHasObjectOrOffMap(currentX, currentY - 1)){
                 int coordHashLength = coordHash.size();
                 coordHash.add(Objects.hash(currentX, currentY - 1));
                 if(coordHash.size()>coordHashLength) {
@@ -211,21 +289,7 @@ public class FieldMapTest {
     }
 
     //TODO Doesn't work with especially concave polygons
-    public void fillComplexPolygon(int[] verticesX, int[] verticesY){
-        int xMax = 0;
-        int xMin = this.getMapX()-1;
-        int yMax = 0;
-        int yMin = this.getMapY()-1;
-
-        for(int i = 0; i < verticesX.length; i++) {
-            xMax = Math.max(verticesX[i], xMax);
-            xMin = Math.min(verticesX[i], xMin);
-        }
-        for(int i = 0; i < verticesY.length; i++) {
-            yMax = Math.max(verticesY[i], yMax);
-            yMin = Math.min(verticesY[i], yMin);
-        }
-
+    public void fillComplexPolygon(int xMax, int xMin, int yMax, int yMin){
         xMax++;
         xMin--;
         yMax++;
@@ -258,8 +322,8 @@ public class FieldMapTest {
     public void addOtherMap(FieldMapTest otherMap, int xMax, int xMin, int yMax, int yMin){
         assert(this.mapSizeEqual(otherMap));
 
-        for(int j = yMin; j < yMax; j++)
-            for(int i = xMin; i < xMax; i++)
+        for(int j = yMin; j <= yMax; j++)
+            for(int i = xMin; i <= xMax; i++)
                 if(!this.checkPixelHasObject(i, j) && otherMap.checkPixelHasObject(i, j))
                     this.drawPixel(i, j);
     }
@@ -283,17 +347,17 @@ public class FieldMapTest {
 
         StringBuilder stringReturn = new StringBuilder();
 
-        stringReturn.append("   ");
-        for(int i = 0; i < intMap[0].length; i++)
-            stringReturn.append(i > 9 ? i+" " : i+"  ");
-        stringReturn.append("\n");
-
-        for(int j = 0; j < intMap.length; j++) {
+        for(int j = intMap.length-1; j >= 0; j--) {
             stringReturn.append(j > 9 ? j+" " : j+"  ");
             for (int i = 0; i < intMap[0].length; i++)
                 stringReturn.append(intMap[j][i] == 0 ? "   ": intMap[j][i]+"  ");
             stringReturn.append("\n");
         }
+
+        stringReturn.append("   ");
+        for(int i = 0; i < intMap[0].length; i++)
+            stringReturn.append(i > 9 ? i+" " : i+"  ");
+        stringReturn.append("\n");
 
         return stringReturn.toString();
     }

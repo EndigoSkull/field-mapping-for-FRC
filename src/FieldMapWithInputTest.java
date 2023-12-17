@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,6 +11,7 @@ public class FieldMapWithInputTest extends FieldMapTest{
     private final ArrayList<Integer> inputCircleX = new ArrayList<>();
     private final ArrayList<Integer> inputCircleY = new ArrayList<>();
     private final ArrayList<Double> inputCircleRadius = new ArrayList<>();
+    private final ArrayList<boolean[]> inputCircleQuadrants = new ArrayList<>();
     private final ArrayList<Boolean> inputCircleFilled = new ArrayList<>();
     private final ArrayList<Integer> inputCircleCount = new ArrayList<>();
 
@@ -34,14 +36,15 @@ public class FieldMapWithInputTest extends FieldMapTest{
         return true;
     }
 
-    public boolean addCircleInput(int x, int y, double radius, boolean circleFilled){
+    public boolean addCircleInput(int x, int y, boolean quadrant1, boolean quadrant2, boolean quadrant3, boolean quadrant4, double radius, boolean circleFilled){
         for(int i = 0; i < inputCircleX.size(); i++)
-            if(inputCircleX.get(i) == x && inputCircleY.get(i) == y && inputCircleRadius.get(i) < 1E-6) {
+            if(inputCircleX.get(i) == x && inputCircleY.get(i) == y && Arrays.hashCode(inputCircleQuadrants.get(i)) == Arrays.hashCode(new boolean[]{quadrant1, quadrant2, quadrant3, quadrant4}) && inputCircleRadius.get(i) < 1E-6) {
                 inputCircleCount.set(i, inputCircleCount.get(i) + 1);
                 return false;
             }
         inputCircleX.add(x);
         inputCircleY.add(y);
+        inputCircleQuadrants.add(new boolean[]{quadrant1, quadrant2, quadrant3, quadrant4});
         inputCircleRadius.add(radius);
         inputCircleFilled.add(circleFilled);
         inputCircleCount.add(1);
@@ -49,7 +52,7 @@ public class FieldMapWithInputTest extends FieldMapTest{
     }
 
     public boolean addPolygonInput(int[] verticesX, int[] verticesY, boolean polygonFilled){
-        for(int i = 0; i < inputPolygonX.size(); i ++) {
+        for(int i = 0; i < inputPolygonX.size(); i++) {
             boolean same = true;
             for (int j = 0; j < inputPolygonX.get(i).length; j++)
                 if (!Objects.equals(inputPolygonX.get(i)[j], inputPolygonY.get(i)[j]))
@@ -83,9 +86,17 @@ public class FieldMapWithInputTest extends FieldMapTest{
     }
     @Override
     public void drawCircle(int centerX, int centerY, double radius, boolean fillCircle) {
-        addCircleInput(centerX, centerY, radius, fillCircle);
+        this.drawCircleQuadrant(centerX, centerY, true, true, true, true, radius, fillCircle);
+    }
+    @Override
+    public void drawCircleQuadrant(double centerX, double centerY, boolean quadrant1, boolean quadrant2, boolean quadrant3, boolean quadrant4, double radius, boolean fillQuadrant){
+        this.drawCircleQuadrant((int)centerX, (int)centerY, quadrant1, quadrant2, quadrant3, quadrant4, radius, fillQuadrant);
+    }
+    @Override
+    public void drawCircleQuadrant(int centerX, int centerY, boolean quadrant1, boolean quadrant2, boolean quadrant3, boolean quadrant4, double radius, boolean fillQuadrant){
+        this.addCircleInput(centerX, centerY, quadrant1, quadrant2, quadrant3, quadrant4, radius, fillQuadrant);
 
-        super.drawCircle(centerX, centerY, radius, fillCircle);
+        super.drawCircleQuadrant(centerX, centerY, quadrant1, quadrant2, quadrant3, quadrant4, radius, fillQuadrant);
     }
 
     @Override
@@ -178,11 +189,11 @@ public class FieldMapWithInputTest extends FieldMapTest{
 
         for(int i = 0; i < inputCircleX.size(); i++){
             if(fillFromInputs && fillCircle)
-                circleMap.drawCircle(inputCircleX.get(i), inputCircleY.get(i), inputCircleRadius.get(i), true);
+                circleMap.drawCircleQuadrant(inputCircleX.get(i), inputCircleY.get(i), inputCircleQuadrants.get(i)[0], inputCircleQuadrants.get(i)[1], inputCircleQuadrants.get(i)[2], inputCircleQuadrants.get(i)[3], inputCircleRadius.get(i), true);
             else if(fillFromInputs && !fillCircle)
-                circleMap.drawCircle(inputCircleX.get(i), inputCircleY.get(i), inputCircleRadius.get(i), false);
+                circleMap.drawCircleQuadrant(inputCircleX.get(i), inputCircleY.get(i), inputCircleQuadrants.get(i)[0], inputCircleQuadrants.get(i)[1], inputCircleQuadrants.get(i)[2], inputCircleQuadrants.get(i)[3],inputCircleRadius.get(i), false);
             else
-                circleMap.drawCircle(inputCircleX.get(i), inputCircleY.get(i), inputCircleRadius.get(i), inputCircleFilled.get(i));
+                circleMap.drawCircleQuadrant(inputCircleX.get(i), inputCircleY.get(i), inputCircleQuadrants.get(i)[0], inputCircleQuadrants.get(i)[1], inputCircleQuadrants.get(i)[2], inputCircleQuadrants.get(i)[3],inputCircleRadius.get(i), inputCircleFilled.get(i));
         }
 
         return circleMap;
@@ -222,6 +233,9 @@ public class FieldMapWithInputTest extends FieldMapTest{
     public ArrayList<Double> getInputCircleRadius(){
         return (new ArrayList<>(List.copyOf(inputCircleRadius)));
     }
+    public ArrayList<boolean[]> getInputCircleQuadrants(){
+        return (new ArrayList<>(List.copyOf(inputCircleQuadrants)));
+    }
     public ArrayList<Boolean> getInputCircleFilled(){
         return (new ArrayList<>(List.copyOf(inputCircleFilled)));
     }
@@ -251,49 +265,18 @@ public class FieldMapWithInputTest extends FieldMapTest{
 
         StringBuilder stringReturn = new StringBuilder();
 
-        stringReturn.append("   ");
-        for(int i = 0; i < intMap[0].length; i++)
-            stringReturn.append(i > 9 ? i+" " : i+"  ");
-        stringReturn.append("\n");
-
-        for(int j = 0; j < intMap.length; j++) {
+        for(int j = intMap.length-1; j >= 0; j--) {
             stringReturn.append(j > 9 ? j+" " : j+"  ");
             for (int i = 0; i < intMap[0].length; i++)
                 stringReturn.append(intMap[j][i] == 0 ? "   ": intMap[j][i]>9 ? intMap[j][i]+" " : intMap[j][i]+"  ");
             stringReturn.append("\n");
         }
 
+        stringReturn.append("   ");
+        for(int i = 0; i < intMap[0].length; i++)
+            stringReturn.append(i > 9 ? i+" " : i+"  ");
+        stringReturn.append("\n");
+
         return stringReturn.toString();
     }
-
-
-//    public int[][] printOverlayedPointsDouble(List<Double> inputX, List<Double> inputY){
-//        ArrayList<Integer> outputX = new ArrayList<>();
-//        ArrayList<Integer> outputY = new ArrayList<>();
-//
-//        inputX.forEach(x -> outputX.add((int)(double)x));
-//        inputY.forEach(y -> outputY.add((int)(double)y));
-//
-//        return printOverlayedPointsInt(outputX, outputY);
-//    }
-//    public int[][] printOverlayedPointsInt(List<Integer> inputX, List<Integer> inputY){
-//        StringBuilder stringReturn = new StringBuilder();
-//
-//        assert(inputX.size() == inputY.size());
-//
-//        int currentPixelInt = 0;
-//
-//        for(int j = 0; j < this.getMapY(); j++)
-//            for(int i = 0; i < this.getMapX(); i++) {
-//                currentPixelInt = this.checkPixel(i, j) ? 1 : 0;
-//                for (int k = 0; k < inputX.size(); k++)
-//                    if (inputX.get(k) == i && inputY.get(k) == j)
-//                        if(currentPixelInt < 2)
-//                            currentPixelInt = 2;
-//                        else
-//                            currentPixelInt++;
-//                stringReturn.append(currentPixelInt+" ");
-//            }
-//        return stringReturn.toString();
-//    }
 }
