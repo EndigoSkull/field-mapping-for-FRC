@@ -75,9 +75,6 @@ public class FieldMapTest {
         this.drawCircleQuadrant((int)centerX, (int)centerY, quadrant1, quadrant2, quadrant3, quadrant4, radius, fillQuadrant);
     }
     public void drawCircleQuadrant(int centerX, int centerY, boolean quadrant1, boolean quadrant2, boolean quadrant3, boolean quadrant4, double radius, boolean fillQuadrant){
-        //TODO from here
-        radius++;
-
         FieldMapTest tempFieldMap = new FieldMapTest(this.getMapX(), this.getMapY());
 
         Bresenham.drawQuadrant(tempFieldMap, centerX, centerY, radius,  quadrant1, quadrant2, quadrant3, quadrant4);
@@ -86,20 +83,20 @@ public class FieldMapTest {
             tempFieldMap.drawPixel(centerX, centerY);
 
         if(quadrant1 ^ quadrant2)
-            for(int stepCoefficient = 1; stepCoefficient < radius; stepCoefficient++)
+            for(int stepCoefficient = 1; stepCoefficient <= radius; stepCoefficient++)
                 tempFieldMap.drawPixel(centerX, centerY + stepCoefficient);
         if(quadrant2 ^ quadrant3)
-            for(int stepCoefficient = 1; stepCoefficient < radius; stepCoefficient++)
+            for(int stepCoefficient = 1; stepCoefficient <= radius; stepCoefficient++)
                 tempFieldMap.drawPixel(centerX - stepCoefficient, centerY);
         if(quadrant3 ^ quadrant4)
-            for(int stepCoefficient = 1; stepCoefficient < radius; stepCoefficient++)
+            for(int stepCoefficient = 1; stepCoefficient <= radius; stepCoefficient++)
                 tempFieldMap.drawPixel(centerX, centerY - stepCoefficient);
         if(quadrant4 ^ quadrant1)
-            for(int stepCoefficient = 1; stepCoefficient < radius; stepCoefficient++)
+            for(int stepCoefficient = 1; stepCoefficient <= radius; stepCoefficient++)
                 tempFieldMap.drawPixel(centerX + stepCoefficient, centerY);
 
-        if((int)radius >=2)
-            if (fillQuadrant) {
+        if(fillQuadrant)
+            if (radius >= 2) {
                 if (quadrant1)
                     tempFieldMap.fillSimplePolygon(centerX + 1, centerY + 1);
                 if (quadrant2)
@@ -108,27 +105,20 @@ public class FieldMapTest {
                     tempFieldMap.fillSimplePolygon(centerX - 1, centerY - 1);
                 if (quadrant4)
                     tempFieldMap.fillSimplePolygon(centerX + 1, centerY - 1);
+            } else{
+                tempFieldMap.drawPixel(centerX, centerY);
             }
 
 //        System.out.println("Temp Map: ");
 //        System.out.println(tempFieldMap);
 
-        if((quadrant1 ^ quadrant2 ^ quadrant3 ^ quadrant4) && (quadrant1 && quadrant2) == (quadrant3 && quadrant4))
-            this.addOtherMap(
-                    tempFieldMap,
-                    (int)(quadrant4 || quadrant1 ? centerX+(radius+1) : centerX+1),
-                    (int)(quadrant2 || quadrant3 ? centerX-(radius+1) : centerX-1),
-                    (int)(quadrant1 || quadrant2 ? centerY+(radius+1) : centerY+1),
-                    (int)(quadrant3 || quadrant4 ? centerY-(radius+1) : centerY-1)
-            );
-        else
-            this.addOtherMap(
-                    tempFieldMap,
-                    (int)(centerX+(radius+1)),
-                    (int)(centerX-(radius+1)),
-                    (int)(centerY+(radius+1)),
-                    (int)(centerY-(radius+1))
-            );
+        this.addOtherMap(
+                tempFieldMap,
+                (int)(quadrant4 || quadrant1 ? centerX+radius+1 : centerX+1),
+                (int)(quadrant2 || quadrant3 ? centerX-radius-1 : centerX-1),
+                (int)(quadrant1 || quadrant2 ? centerY+radius+1 : centerY+1),
+                (int)(quadrant3 || quadrant4 ? centerY-radius-1 : centerY-1)
+        );
     }
 
     public void drawPolygonDouble(List<Double> verticesX, List<Double> verticesY, boolean fillPolygon){
@@ -317,7 +307,7 @@ public class FieldMapTest {
     public void addOtherMap(FieldMapTest otherMap){
         assert(this.mapSizeEqual(otherMap));
 
-        this.addOtherMap(otherMap, this.getMapX(), 0, this.getMapY(), 0);
+        this.addOtherMap(otherMap, this.getMapX()-1, 0, this.getMapY()-1, 0);
     }
     public void addOtherMap(FieldMapTest otherMap, int xMax, int xMin, int yMax, int yMin){
         assert(this.mapSizeEqual(otherMap));
