@@ -56,6 +56,96 @@ public class Bresenham {
         return collided;
     }
 
+    public static int[] drawPerpLine(FieldMapTest map, double startMinRadius, int x1, int y1, int x2, int y2) {
+        int midPixelX = (x2-x1)/2+x1;
+        int midPixelY = (y2-y1)/2+y1;
+
+        int hold = midPixelX-(y2-y1);
+        y2 = midPixelY+(x2-x1);
+        x2 = hold;
+
+        x1 = midPixelX;
+        y1 = midPixelY;
+
+        int dx, dy, e;
+        int incx, incy, inc1, inc2;
+        int posX, posY;
+        int negX, negY;
+        dx = x2 - x1;
+        dy = y2 - y1;
+        if (dx < 0) dx = -dx;
+        if (dy < 0) dy = -dy;
+        incx = 1;
+        if (x2 < x1) incx = -1;
+        incy = 1;
+        if (y2 < y1) incy = -1;
+        posX = x1; posY = y1;
+        negX = x1; negY = y1;
+        if (dx > dy) {
+            if(!map.checkPixelHasObjectOrOffMap(posX, posY)){
+                return new int[]{posX, posY};
+            }
+            if(!map.checkPixelHasObjectOrOffMap(negX, negY)){
+                return new int[]{negX, negY};
+            }
+            e = 2 * dy - dx;
+            inc1 = 2 * (dy - dx);
+            inc2 = 2 * dy;
+            while (map.checkPixelOnMap(posX, posY) || map.checkPixelOnMap(negX, negY))
+            {
+                if (e >= 0)
+                {
+                    posY += incy;
+                    negY -= incy;
+                    e += inc1;
+                }
+                else
+                    e += inc2;
+                posX += incx;
+                negX -= incx;
+                if(!map.checkPixelHasObjectOrOffMap(posX, posY)){
+                    return new int[]{posX, posY};
+                }
+                if(!map.checkPixelHasObjectOrOffMap(negX, negY)){
+                    return new int[]{negX, negY};
+                }
+            }
+        }
+        else
+        {
+            if(!map.checkPixelHasObjectOrOffMap(posX, posY)){
+                return new int[]{posX, posY};
+            }
+            if(!map.checkPixelHasObjectOrOffMap(negX, negY)){
+                return new int[]{negX, negY};
+            }
+            e = 2 * dx - dy;
+            inc1 = 2 * (dx - dy);
+            inc2 = 2 * dx;
+            while (map.checkPixelOnMap(posX, posY) || map.checkPixelOnMap(negX, negY))
+            {
+                if (e >= 0)
+                {
+                    posX += incx;
+                    negX -= incx;
+                    e += inc1;
+                }
+                else
+                    e += inc2;
+                posY += incy;
+                negY -= incy;
+                if(!map.checkPixelHasObjectOrOffMap(posX, posY)){
+                    return new int[]{posX, posY};
+                }
+                if(!map.checkPixelHasObjectOrOffMap(negX, negY)){
+                    return new int[]{negX, negY};
+                }
+            }
+        }
+        System.out.println("Error in perping");
+        return null;
+    }
+
     public static boolean drawQuadrant(FieldMapTest map, int centerX, int centerY, double radius, boolean first, boolean second, boolean third, boolean fourth){
         boolean collided = false;
 

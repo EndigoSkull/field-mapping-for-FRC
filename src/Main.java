@@ -4,41 +4,51 @@ public class Main {
 
     public static final boolean randomExpansionWidthFromZero = true;
     private static final double expansionWidth = 10;
-    private static final double expansionWidthIncrement = 0.1;
+    private static final double expansionWidthIncrement = 5;
 
     private static final int randomLineNum = 2;
+
     private static final int randomCircleNum = 1;
     private static final boolean randomFillCircle = false;
     private static final boolean randomQuadrants = true;
     private static final boolean fillCircleQuadrants = false;
+
     private static final int randomPolygonNum = 1;
     private static final int polygonVertNum = 3;
     private static final boolean fillPolygon = true;
 
+    private static final boolean runCustom = true;
+
     public static void main(String[] args) {
-        FieldMapTest scaledMap = new FieldMapTest(1654, 802);
-        FieldMapTest correctScaleMap = new FieldMapTest(mapX, mapY);
+        FieldMapTest fullScaleMap = new FieldMapTest(1654, 802);
+        FieldMapTest inputScaleMap = new FieldMapTest(mapX, mapY);
 
-        FieldMapWithInputTest inputScaledMap = new FieldMapWithInputTest(1654, 802);
-        FieldMapWithInputTest inputCorrectScaleMap = new FieldMapWithInputTest(mapX, mapY);
+        FieldMapWithInputTest inputFullScaleMap = new FieldMapWithInputTest(1654, 802);
+        FieldMapWithInputTest inputsInputScaleMap = new FieldMapWithInputTest(mapX, mapY);
 
-        double baseScaleMapTime = runTests(scaledMap);
-        double toScaleMapTime = runTests(correctScaleMap);
+        inputScaleMap.drawPolygon(new int[]{5, 11, 11, 1}, new int[]{5, 5, 11, 18}, true);
+        System.out.println(inputScaleMap);
+        int[] perp = inputScaleMap.getPerpPixel(0, 4, 4, 12, 12);
+        System.out.println(perp[0]+" "+perp[1]);
 
-        double inputBaseScaleMapTime = runTests(inputScaledMap);
-        double inputToScaleMapTime = runTests(inputCorrectScaleMap);
+        if(!runCustom){
+            double baseScaleMapTime = runTests(fullScaleMap);
+            double toScaleMapTime = runTests(inputScaleMap);
 
-//        double centerX = Math.random() * inputCorrectScaleMap.getMapX();
-//        double centerY = Math.random() * inputCorrectScaleMap.getMapY();
-//        double radius = Math.random()*((Math.min(inputCorrectScaleMap.getMapX(), inputCorrectScaleMap.getMapY()))/2.0);
+            double inputBaseScaleMapTime = runTests(inputFullScaleMap);
+            double inputToScaleMapTime = runTests(inputsInputScaleMap);
+
+//        double centerX = Math.random() * inputsInputScaleMap.getMapX();
+//        double centerY = Math.random() * inputsInputScaleMap.getMapY();
+//        double radius = Math.random()*((Math.min(inputsInputScaleMap.getMapX(), inputsInputScaleMap.getMapY()))/2.0);
 //
 //        boolean quadrant1 = Math.random() > 0.5;
 //        boolean quadrant2 = Math.random() > 0.5;
 //        boolean quadrant3 = Math.random() > 0.5;
 //        boolean quadrant4 = Math.random() > 0.5;
 //
-//        //inputCorrectScaleMap.drawCircleQuadrant(centerX, centerY, quadrant1, quadrant2, quadrant3, quadrant4, radius, fillCircle);
-//        correctScaleMap.drawCircleQuadrant(centerX, centerY, quadrant1, quadrant2, quadrant3, quadrant4, radius, fillCircleQuadrants);
+//        //inputsInputScaleMap.drawCircleQuadrant(centerX, centerY, quadrant1, quadrant2, quadrant3, quadrant4, radius, fillCircle);
+//        inputScaleMap.drawCircleQuadrant(centerX, centerY, quadrant1, quadrant2, quadrant3, quadrant4, radius, fillCircleQuadrants);
 //
 //        System.out.println(quadrant1);
 //        System.out.println(quadrant2);
@@ -47,49 +57,50 @@ public class Main {
 //        System.out.println("("+centerX+", "+centerY+")");
 //        System.out.println(radius);
 //
-//        System.out.println(correctScaleMap);
-        printData(inputCorrectScaleMap, inputToScaleMapTime);
+//        System.out.println(inputScaleMap);
+            printData(inputsInputScaleMap, inputToScaleMapTime);
 
-        System.out.println("baseScaleMapTime: "+baseScaleMapTime);
-        System.out.println("toScaleMapTime: "+toScaleMapTime);
-        System.out.println("Ratio of baseScaleMapTime to toScaleMapTime: "+(baseScaleMapTime/toScaleMapTime));
-        System.out.println("Ratio of scaledMap area to correctScaleMap area: "+((scaledMap.getMapX()*scaledMap.getMapY())/(correctScaleMap.getMapX()*correctScaleMap.getMapY())));
-        System.out.println("Ratio of time ratio to area ratio: "+((baseScaleMapTime/toScaleMapTime)/((scaledMap.getMapX()*scaledMap.getMapY())/(correctScaleMap.getMapX()*correctScaleMap.getMapY()))));
-        System.out.println();
-        System.out.println("inputBaseScaleMapTime: "+inputBaseScaleMapTime);
-        System.out.println("inputToScaleMapTime: "+inputToScaleMapTime);
-        System.out.println("Ratio of inputBaseScaleMapTime to inputToScaleMapTime: "+(inputBaseScaleMapTime/inputToScaleMapTime));
-        System.out.println("Ratio of inputScaledMap area to inputCorrectScaleMap area: "+((inputScaledMap.getMapX()*inputScaledMap.getMapY())/(inputCorrectScaleMap.getMapX()* inputCorrectScaleMap.getMapY())));
-        System.out.println("Ratio of time ratio to area ratio: "+((inputBaseScaleMapTime/inputToScaleMapTime)/((inputScaledMap.getMapX()*inputScaledMap.getMapY())/(inputCorrectScaleMap.getMapX()* inputCorrectScaleMap.getMapY()))));
-
-        for(double testExpansionWidth = expansionWidth; testExpansionWidth >= 0; testExpansionWidth -= expansionWidthIncrement) {
-
-            if (randomExpansionWidthFromZero) {
-                testExpansionWidth = Math.random() * expansionWidth;
-            }
-
-            UpdatableAndExpandableFieldMapTest updatableMap = new UpdatableAndExpandableFieldMapTest(mapX, mapY, inputCorrectScaleMap.getCopy(), inputCorrectScaleMap.getCopy(), testExpansionWidth);
-
-            if(testExpansionWidth-expansionWidthIncrement > 0)
-                if(updatableMap.isPerfectOverlay())
-                    continue;
-
-            System.out.println("testExpansionWidth: " + testExpansionWidth);
-
-            System.out.println("Expansion Map Overlay: ");
-            System.out.println(updatableMap.printOverlayedMaps(true, true, false, true));
-
-            System.out.println("Comparing Target Expanded Map: ");
-            System.out.println(updatableMap.printExpansionMapTest());
-
-            System.out.println("Target Expanded Map: ");
-            System.out.println(updatableMap.getTargetExpandedMap(inputCorrectScaleMap));
-
-            System.out.println("Updatable Map: ");
-            System.out.println(updatableMap.getCurrentMap());
+            System.out.println("baseScaleMapTime: " + baseScaleMapTime);
+            System.out.println("toScaleMapTime: " + toScaleMapTime);
+            System.out.println("Ratio of baseScaleMapTime to toScaleMapTime: " + (baseScaleMapTime / toScaleMapTime));
+            System.out.println("Ratio of fullScaleMap area to inputScaleMap area: " + ((fullScaleMap.getMapX() * fullScaleMap.getMapY()) / (inputScaleMap.getMapX() * inputScaleMap.getMapY())));
+            System.out.println("Ratio of time ratio to area ratio: " + ((baseScaleMapTime / toScaleMapTime) / ((fullScaleMap.getMapX() * fullScaleMap.getMapY()) / (inputScaleMap.getMapX() * inputScaleMap.getMapY()))));
             System.out.println();
+            System.out.println("inputBaseScaleMapTime: " + inputBaseScaleMapTime);
+            System.out.println("inputToScaleMapTime: " + inputToScaleMapTime);
+            System.out.println("Ratio of inputBaseScaleMapTime to inputToScaleMapTime: " + (inputBaseScaleMapTime / inputToScaleMapTime));
+            System.out.println("Ratio of inputFullScaleMap area to inputsInputScaleMap area: " + ((inputFullScaleMap.getMapX() * inputFullScaleMap.getMapY()) / (inputsInputScaleMap.getMapX() * inputsInputScaleMap.getMapY())));
+            System.out.println("Ratio of time ratio to area ratio: " + ((inputBaseScaleMapTime / inputToScaleMapTime) / ((inputFullScaleMap.getMapX() * inputFullScaleMap.getMapY()) / (inputsInputScaleMap.getMapX() * inputsInputScaleMap.getMapY()))));
 
-            break;
+            for (double testExpansionWidth = expansionWidth; testExpansionWidth >= 0; testExpansionWidth -= expansionWidthIncrement) {
+
+                if (randomExpansionWidthFromZero) {
+                    testExpansionWidth = Math.random() * expansionWidth;
+                }
+
+                UpdatableAndExpandableFieldMapTest updatableMap = new UpdatableAndExpandableFieldMapTest(mapX, mapY, inputsInputScaleMap.getCopy(), inputsInputScaleMap.getCopy(), testExpansionWidth);
+
+                if (testExpansionWidth - expansionWidthIncrement > 0)
+                    if (updatableMap.isPerfectOverlay())
+                        continue;
+
+                System.out.println("testExpansionWidth: " + testExpansionWidth);
+
+                System.out.println("Expansion Map Overlay: ");
+                System.out.println(updatableMap.printOverlayedMaps(true, true, false, true));
+
+                System.out.println("Comparing Target Expanded Map: ");
+                System.out.println(updatableMap.printExpansionMapTest());
+
+                System.out.println("Target Expanded Map: ");
+                System.out.println(updatableMap.getTargetExpandedMap(inputsInputScaleMap));
+
+                System.out.println("Updatable Map: ");
+                System.out.println(updatableMap.getCurrentMap());
+                System.out.println();
+
+                break;
+            }
         }
     }
     public static double runTests(FieldMapTest field){

@@ -332,6 +332,13 @@ public class FieldMapTest {
                     this.drawPixel(i, j);
     }
 
+    public int[] getPerpPixel(double startMinRadius, int startPixelX, int startPixelY, int endPixelX, int endPixelY){
+        assert(!this.checkPixelHasObjectOrOffMap(startPixelX, startPixelY));
+        assert(!this.checkPixelHasObjectOrOffMap(endPixelX, endPixelY));
+
+        return Bresenham.drawPerpLine(this, startMinRadius, startPixelX, startPixelY, endPixelX, endPixelY);
+    }
+
     public String toString(){
         int[][] intMap = getBaseIntMap();
 

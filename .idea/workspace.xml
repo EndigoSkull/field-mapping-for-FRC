@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="152bc897-4125-4163-aaa6-2c98d3a6bd4e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/OverlayedFieldMapsTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Bresenham.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Bresenham.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/FieldMapTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FieldMapTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/UpdatableAndExpandableFieldMapTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/UpdatableAndExpandableFieldMapTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,6 +74,15 @@
           <properties class="java.lang.OutOfMemoryError" package="java.lang" />
           <option name="timeStamp" value="3" />
         </breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/FieldMapTest.java</url>
+          <line>341</line>
+          <properties class="FieldMapTest" method="getPerpPixel">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
