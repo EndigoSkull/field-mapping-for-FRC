@@ -82,11 +82,13 @@ public class Bresenham {
         posX = x1; posY = y1;
         negX = x1; negY = y1;
         if (dx > dy) {
-            if(!map.checkPixelHasObjectOrOffMap(posX, posY)){
-                return new int[]{posX, posY};
-            }
-            if(!map.checkPixelHasObjectOrOffMap(negX, negY)){
-                return new int[]{negX, negY};
+            if(dist(posX, posY, midPixelX, midPixelY) > startMinRadius){
+                if (!map.checkPixelHasObjectOrOffMap(posX, posY)) {
+                    return new int[]{posX, posY};
+                }
+                if (!map.checkPixelHasObjectOrOffMap(negX, negY)) {
+                    return new int[]{negX, negY};
+                }
             }
             e = 2 * dy - dx;
             inc1 = 2 * (dy - dx);
@@ -103,21 +105,25 @@ public class Bresenham {
                     e += inc2;
                 posX += incx;
                 negX -= incx;
-                if(!map.checkPixelHasObjectOrOffMap(posX, posY)){
-                    return new int[]{posX, posY};
-                }
-                if(!map.checkPixelHasObjectOrOffMap(negX, negY)){
-                    return new int[]{negX, negY};
+                if(dist(posX, posY, midPixelX, midPixelY) > startMinRadius){
+                    if (!map.checkPixelHasObjectOrOffMap(posX, posY)) {
+                        return new int[]{posX, posY};
+                    }
+                    if (!map.checkPixelHasObjectOrOffMap(negX, negY)) {
+                        return new int[]{negX, negY};
+                    }
                 }
             }
         }
         else
         {
-            if(!map.checkPixelHasObjectOrOffMap(posX, posY)){
-                return new int[]{posX, posY};
-            }
-            if(!map.checkPixelHasObjectOrOffMap(negX, negY)){
-                return new int[]{negX, negY};
+            if(dist(posX, posY, midPixelX, midPixelY) > startMinRadius){
+                if (!map.checkPixelHasObjectOrOffMap(posX, posY)) {
+                    return new int[]{posX, posY};
+                }
+                if (!map.checkPixelHasObjectOrOffMap(negX, negY)) {
+                    return new int[]{negX, negY};
+                }
             }
             e = 2 * dx - dy;
             inc1 = 2 * (dx - dy);
@@ -134,11 +140,13 @@ public class Bresenham {
                     e += inc2;
                 posY += incy;
                 negY -= incy;
-                if(!map.checkPixelHasObjectOrOffMap(posX, posY)){
-                    return new int[]{posX, posY};
-                }
-                if(!map.checkPixelHasObjectOrOffMap(negX, negY)){
-                    return new int[]{negX, negY};
+                if(dist(posX, posY, midPixelX, midPixelY) > startMinRadius) {
+                    if (!map.checkPixelHasObjectOrOffMap(posX, posY)) {
+                        return new int[]{posX, posY};
+                    }
+                    if (!map.checkPixelHasObjectOrOffMap(negX, negY)) {
+                        return new int[]{negX, negY};
+                    }
                 }
             }
         }
@@ -210,5 +218,12 @@ public class Bresenham {
 
     public static boolean drawCircle(FieldMapTest map, int centerX, int centerY, double radius){
         return drawQuadrant(map, centerX, centerY, radius, true, true, true, true);
+    }
+
+    public static double dist(int x1, int y1, int x2, int y2){
+        return dist((double)x1, (double)y1, (double)x2, (double)y2);
+    }
+    public static double dist(double x1, double y1, double x2, double y2){
+        return Math.sqrt(Math.pow(x2-x1, 2)+Math.pow(y2-y1, 2));
     }
 }

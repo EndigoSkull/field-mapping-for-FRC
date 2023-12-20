@@ -28,7 +28,7 @@ public class Main {
 
         inputScaleMap.drawPolygon(new int[]{5, 11, 11, 1}, new int[]{5, 5, 11, 18}, true);
         System.out.println(inputScaleMap);
-        int[] perp = inputScaleMap.getPerpPixel(0, 4, 4, 12, 12);
+        int[] perp = inputScaleMap.getPerpPixel(8, 4, 4, 12, 12);
         System.out.println(perp[0]+" "+perp[1]);
 
         if(!runCustom){
